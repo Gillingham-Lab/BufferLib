@@ -15,9 +15,5 @@ Chem =                      [
 with open("Chemicals.pickle", "wb") as handle:
     pickle.dump(Chem, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-leer = "Nix Leer"
-for i in Chem:
-    if i["name"] == "" or i["mass"] == "" or i['aggregation'] == "" or i['density'] == "":
-        leer ="Da Leer"
 
 print(leer)
