@@ -501,10 +501,12 @@ def show_content(n_clicks, chose):
     if chose == "buffer":
         with open("Buffer.pickle", "rb") as f:
             Buffer = pickle.load(f)
+            print(Buffer)
         return Buffer, Col_Buffer
     if chose == "chem":
         with open("Chemicals.pickle", "rb") as f:
             Chem = pickle.load(f)
+            print(Chem)
         return Chem, Col_Chem
 
 @app.callback(
@@ -538,8 +540,25 @@ def save_changes(n_clicks, data, columns, password):
                 pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         if columns == Col_Buffer:
+            #data = [{"name": data["name"], "use": data["use"], "ingredients": c, "molarity": d, "unit": e} for (c, d, e) in zip(data["ingredients"].split(", "), data["molarity"].split(", "), data["unit"].split(", "))]
+            new_data = []
+            for buffer in data:
+                _buffer = {}
+
+                for k, v in buffer.items():
+                    if k in ["ingredients", "molarity", "unit"]:
+                        if isinstance(v, str):
+                            _buffer[k] = v.split(", ")
+                        else:
+                            _buffer[k] = v
+                    else:
+                        _buffer[k] = v
+
+                new_data.append(_buffer)
+
+
             with open("Buffer.pickle", "wb") as handle:
-                pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                pickle.dump(new_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         return "Update successful"
     else:
