@@ -7,7 +7,6 @@ Buffer = [
         "ingredients": ["Tris", "Glycerol", "DTT", "EDTA"],
         "molarity": [50e-3, 5, 1e-3, 1e-3],
         "unit": ["M", "%", "M", "M"],
-        "info": "",
     },
     {
         "name": "Rad-52 Reaction Buffer",
@@ -15,7 +14,6 @@ Buffer = [
         "ingredients": ["Bis-Tris propane", "NaCl", "BME"],
         "molarity": [25e-3, 200e-3, 2e-3],
         "unit": ["M", "M", "M"],
-        "info": "",
     },
     {
         'name': 'Ammonium Acetate 50mM',
@@ -23,7 +21,6 @@ Buffer = [
         'ingredients': ['Ammonium Acetate'],
         'molarity': [0.05],
         'unit': ['M'],
-        "info": "",
     },
     {
         'name': 'KRAS (G12C) Running Buffer (PH 7.0, Marx et al)',
@@ -31,7 +28,6 @@ Buffer = [
         'ingredients': ['HEPES', 'NaCl', 'MgCl2', 'Octyl glucopyranoside', 'TCEP HCl'],
         'molarity': [0.025, 0.15, 0.005, 0.01, 0.0005],
         'unit': ['M', 'M', 'M', 'M', 'M'],
-        "info": "",
     },
     {
         'name': 'Tubulin Reaction Buffer (Ph 7.0, L.Chen et al, 2019)',
@@ -39,14 +35,13 @@ Buffer = [
         'ingredients': ['PIPES', 'EDTA', 'MgCl2', 'Na2GDP'],
         'molarity': [0.08, 0.0005, 0.002, 0.001],
         'unit': ['M', 'M', 'M', 'M'],
-        "info": "",
     },
 ]
 
 
 BufferListed = {"name": [d['name'] for d in Buffer], "ingredients": [d['ingredients'] for d in Buffer],
                       "molarity": [d['molarity'] for d in Buffer], "unit": [d['unit'] for d in Buffer]}
-print(BufferListed)
+print(Buffer)
 
 
 with open("Buffer.pickle", "wb") as handle:

@@ -19,6 +19,7 @@ Col_Buffer = [
     {"id": "ingredients", 'name': 'Ingredients'},
     {"id": "molarity", 'name': 'Molarity'},
     {"id": "unit", 'name': 'unit'},
+    {"id": "info", 'name': 'Information'},
     ]
 
 Col_Chem = [
@@ -93,11 +94,11 @@ app.layout = html.Div(
 
                 html.Br(),
 
-                html.H1(id="check_ok", children = ""),
+                html.H2(id="check_ok", children = ""),
 
                 html.Br(),
 
-                html.H2(id="NameNewBuffer", children=""),
+                html.H4(id="NameNewBuffer", children=""),
 
                 html.Br(),
 
@@ -150,6 +151,22 @@ app.layout = html.Div(
 
                 dbc.Button('Add Row', id='editing-rows-button', n_clicks=0, disabled=False),
 
+                html.Br(),
+
+                html.Br(),
+
+                html.H4("Buffer Information"),
+
+                dcc.Textarea(
+                    id = "info_in",
+                    value = "",
+                    placeholder = "Enter information here",
+                    style = {"width": "100%", "height": 100},
+                    maxLength= "300",
+                ),
+
+                html.Br(),
+
                 dbc.Button("Button", id="Button", color="primary", block=True, className="mt-3", disabled=False),
 
             ]),
@@ -182,12 +199,17 @@ app.layout = html.Div(
 
             html.Br(),
 
-            html.Hr(),
+            dcc.Textarea(
+                id="info_show",
+                value="",
+                style={"width": "100%", "height": 100},
+                maxLength="300",
+                disabled= True,
+            ),
 
             html.Br(),
 
-
-
+            html.Br(),
 
             dbc.Row([
 
@@ -353,18 +375,20 @@ def add_row(n_clicks, rows, columns):
         Output("Output", "children"),
         Output("NameCheck_recipe", "children"),
         Output("UseCheck_recipe", "children"),
+        Output("info_show", "value"),
     ],
         Input("Button", "n_clicks"),
         State("table", "data"),
         State("NameNewBuffer", "children"),
         State("subfolder", "value"),
+        State("info_in","value"),
 )
-def control(n_clicks, data, NameNewBuffer, subfolder):
+def control(n_clicks, data, NameNewBuffer, subfolder, info_in):
 
     global Col_recipe
 
     if not n_clicks:
-        return [], Col_recipe, "", "", "", "", ""
+        return [], Col_recipe, "", "", "", "", "", ""
     if n_clicks > 0:
 
 
@@ -375,9 +399,9 @@ def control(n_clicks, data, NameNewBuffer, subfolder):
                 EmptyField = "Yes"
 
         if EmptyField == "Yes":
-            return [], Col_recipe, "", "", "Please fill in all empty fields", "", ""
+            return [], Col_recipe, "", "", "Please fill in all empty fields", "", "", ""
         if EmptyField == "No":
-            return data, Col_recipe, "Recipe", "Please check if the Recipe is correct!", "Successful", f"Name: {NameNewBuffer}", f"Usage: {subfolder} Buffer"
+            return data, Col_recipe, "Recipe", "Please check if the Recipe is correct!", "Successful", f"Name: {NameNewBuffer}", f"Usage: {subfolder} Buffer", info_in
 
 
 @app.callback(
@@ -387,9 +411,10 @@ def control(n_clicks, data, NameNewBuffer, subfolder):
         State("table_recipe", "columns"),
         State("subfolder", "value"),
         State("NameNewBuffer", "children"),
-        State("password_1", "value")
+        State("password_1", "value"),
+        State("info_show", "value"),
 )
-def data(n_clicks, data, columns, subfolder, NameNewBuffer, password):
+def data(n_clicks, data, columns, subfolder, NameNewBuffer, password, info):
     global Password
     with open("Buffer.pickle", "rb") as f:
         Buffer = pickle.load(f)
@@ -399,7 +424,9 @@ def data(n_clicks, data, columns, subfolder, NameNewBuffer, password):
 
     BufferListed = {"name": [d['name'] for d in Buffer], "use": [d['use'] for d in Buffer],
                     "ingredients": [d['ingredients'] for d in Buffer],
-                    "molarity": [d['molarity'] for d in Buffer], "unit": [d['unit'] for d in Buffer]}
+                    "molarity": [d['molarity'] for d in Buffer], "unit": [d['unit'] for d in Buffer], "info": [d['info'] for d in Buffer]}
+    #print(BufferListed)
+    #print(info)
 
     ChemListed = {"name": [d['name'] for d in Chem], "mass": [d['mass'] for d in Chem],
                   "aggregation": [d['aggregation'] for d in Chem], "density": [d['density'] for d in Chem]}
@@ -417,6 +444,7 @@ def data(n_clicks, data, columns, subfolder, NameNewBuffer, password):
 
             BufferListed["name"].append(NameNewBuffer)
             BufferListed["use"].append(subfolder)
+            BufferListed["info"].append(info)
 
             ListNewIngredients = []
             ListNewMolarity = []
@@ -460,7 +488,7 @@ def data(n_clicks, data, columns, subfolder, NameNewBuffer, password):
             BufferListed["unit"].append(ListNewUnit)
 
             Chem = [{"name": a, "mass": b, "aggregation": c, "density": d} for (a, b, c, d) in zip(ChemListed["name"], ChemListed["mass"], ChemListed["aggregation"], ChemListed["density"])]
-            Buffer = [{"name": a, "use": b, "ingredients": c, "molarity": d, "unit": e} for (a, b, c, d, e) in zip(BufferListed["name"], BufferListed["use"], BufferListed["ingredients"], BufferListed["molarity"], BufferListed["unit"])]
+            Buffer = [{"name": a, "use": b, "ingredients": c, "molarity": d, "unit": e, "info": f} for (a, b, c, d, e, f) in zip(BufferListed["name"], BufferListed["use"], BufferListed["ingredients"], BufferListed["molarity"], BufferListed["unit"], BufferListed["info"])]
 
             with open("Buffer.pickle", "wb") as handle:
                 pickle.dump(Buffer, handle, protocol=pickle.HIGHEST_PROTOCOL)

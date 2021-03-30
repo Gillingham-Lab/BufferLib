@@ -78,6 +78,16 @@ options_buffer =            [
                             {"label": "Other Buffer", "value": "Other"},
                             ]
 
+#--------------- infos
+
+info_buffer =   [
+                {"value": "Protein", "info": "Buffer that are used to run in vitro experiments with proteins"},
+                {"value": "DNA", "info": "Buffer to work with DNA"},
+                {"value": "HPLC", "info": "HPLC eluents etc."},
+                {"value": "EXP", "info": "Buffers for experiments eg. Lysis etc"},
+                {"value": "Other", "info": "Buffer that do not contain to anything else"},
+]
+
 #--------------- layout
 
 
@@ -159,11 +169,17 @@ app.layout = html.Div(
 
                 dbc.Col(width=6, children=[
 
-                    html.H2("Info"),
+                    html.H2("Information"),
+
+                    html.H4("Category Info"),
+
+                    html.P(id="info_cat", children = "Choose category for information"),
+
+                    html.H4("Buffer Info"),
+
+                    html.P(id="info_Buf", children = ""),
 
                     html.Br(),
-
-                    html.P(id="info", children= "")
 
                 ]),
             ]),
@@ -209,13 +225,17 @@ app.layout = html.Div(
 #-------------------- options menu 1
 
 @app.callback(
+        [
     Output("Buffer_under_options", "options"),
+    Output("info_cat", "children"),
+        ],
     Input("Buffer_options", "value")
 )
 def menu_1(buffer):
     with open("Buffer.pickle", "rb") as f:
         Buffer = pickle.load(f)
 
+    global info_buffer
     Protbuffer = []
     DNAbuffer = []
     HPLCbuffer = []
@@ -228,9 +248,9 @@ def menu_1(buffer):
         if Buffer[i]["use"] == "DNA":
             DNAbuffer.append(Buffer[i]["name"])
         if Buffer[i]["use"] == "HPLC":
-            ExpBuffer.append(Buffer[i]["name"])
-        if Buffer[i]["use"] == "EXP":
             HPLCbuffer.append(Buffer[i]["name"])
+        if Buffer[i]["use"] == "EXP":
+            ExpBuffer.append(Buffer[i]["name"])
         if Buffer[i]["use"] == "Other":
             Otherbuffer.append(Buffer[i]["name"])
 
@@ -238,8 +258,7 @@ def menu_1(buffer):
     DNAbuffer = sorted(DNAbuffer)
     HPLCbuffer = sorted(HPLCbuffer)
     Otherbuffer = sorted(Otherbuffer)
-    ExpBuffer = sorted(Otherbuffer)
-
+    ExpBuffer = sorted(ExpBuffer)
 
     options_Protbuffer = [
         {"label": i, "value": i}
@@ -259,19 +278,47 @@ def menu_1(buffer):
 
 
     if buffer == "Protein":
-        return options_Protbuffer
+        for i, j in enumerate(info_buffer):
+            if info_buffer[i]["value"] == "Protein":
+                info = info_buffer[i]["info"]
+        return options_Protbuffer, info
     elif buffer == "DNA":
-        return options_DNAbuffer
+        for i, j in enumerate(info_buffer):
+            if info_buffer[i]["value"] == "DNA":
+                info = info_buffer[i]["info"]
+        return options_DNAbuffer, info
     elif buffer == "HPLC":
-        return options_HPLCbuffer
+        for i, j in enumerate(info_buffer):
+            if info_buffer[i]["value"] == "HPLC":
+                info = info_buffer[i]["info"]
+        return options_HPLCbuffer, info
     elif buffer == "EXP":
-        return options_Expbuffer
+        for i, j in enumerate(info_buffer):
+            if info_buffer[i]["value"] == "EXP":
+                info = info_buffer[i]["info"]
+        return options_Expbuffer, info
     elif buffer == "Other":
-        return options_Otherbuffer
+        for i, j in enumerate(info_buffer):
+            if info_buffer[i]["value"] == "Other":
+                info = info_buffer[i]["info"]
+        return options_Otherbuffer, info
     else:
-        return []
+        return [], "Choose category for information"
 
 #-------------------- show ing
+
+@app.callback(
+        Output("info_Buf", "children"),
+        Input("Buffer_under_options", "value"),
+)
+def Buffer_info(chosen):
+    with open("Buffer.pickle", "rb") as f:
+        Buffer = pickle.load(f)
+    for i, j in enumerate(Buffer):
+        if Buffer[i]["name"] == chosen:
+            return Buffer[i]["info"]
+
+
 
 @app.callback(
     [
@@ -288,6 +335,7 @@ def table_ing(chosen, vol, vol_unit):
 
     with open("Buffer.pickle", "rb") as f:
         Buffer = pickle.load(f)
+    print(Buffer)
 
     try:
         vol = float(vol) * float(vol_unit)

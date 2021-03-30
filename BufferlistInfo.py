@@ -2,12 +2,12 @@ import pickle
 
 Buffer = [
     {
-        "name": "Mgmt Reaction Buffer",
+        "name": "Mgmt Reaction Buffer (pH 8.0, Flutscher et al, 1997)",
         "use": "Protein",
         "ingredients": ["Tris", "Glycerol", "DTT", "EDTA"],
         "molarity": [50e-3, 5, 1e-3, 1e-3],
         "unit": ["M", "%", "M", "M"],
-        "info": "",
+        "info": "Adjust pH to 8 with NaOH",
     },
     {
         "name": "Rad-52 Reaction Buffer",
@@ -26,7 +26,7 @@ Buffer = [
         "info": "",
     },
     {
-        'name': 'KRAS (G12C) Running Buffer (PH 7.0, Marx et al)',
+        'name': 'KRAS (G12C) Running Buffer (pH 7.0, Marx et al)',
         'use': 'Protein',
         'ingredients': ['HEPES', 'NaCl', 'MgCl2', 'Octyl glucopyranoside', 'TCEP HCl'],
         'molarity': [0.025, 0.15, 0.005, 0.01, 0.0005],
@@ -34,7 +34,7 @@ Buffer = [
         "info": "",
     },
     {
-        'name': 'Tubulin Reaction Buffer (Ph 7.0, L.Chen et al, 2019)',
+        'name': 'Tubulin Reaction Buffer (pH 7.0, L.Chen et al, 2019)',
         'use': 'Protein',
         'ingredients': ['PIPES', 'EDTA', 'MgCl2', 'Na2GDP'],
         'molarity': [0.08, 0.0005, 0.002, 0.001],
