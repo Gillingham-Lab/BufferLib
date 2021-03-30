@@ -74,6 +74,7 @@ options_buffer =            [
                             {"label": "Protein Buffer", "value": "Protein"},
                             {"label": "DNA Buffer", "value": "DNA"},
                             {"label": "HPLC Buffer", "value": "HPLC"},
+                            {"label": "Experiment Buffer", "value": "EXP"},
                             {"label": "Other Buffer", "value": "Other"},
                             ]
 
@@ -118,13 +119,13 @@ app.layout = html.Div(
 
                     dbc.InputGroup(
                         [
-                            dbc.Input(id="input-volume", value=1, disabled=False),
+                            dbc.Input(id="input-volume", value=50, disabled=False),
 
                             dbc.InputGroupAddon([
                                 dcc.Dropdown(
                                     id="input-volume-unit",
                                     options= options_units_volume,
-                                    value= 1,
+                                    value= 1e-3,
                                     className=" mb-3",
                                     disabled=False
                                 )
@@ -147,6 +148,37 @@ app.layout = html.Div(
                         className= "mb-3"
                     ),
 
+
+                    dbc.Button("Show Recipe", id="Show", color="primary", block=True, className="mt-3", disabled=False),
+
+                    html.Br(),
+
+                ]),
+
+
+
+                dbc.Col(width=6, children=[
+
+                    html.H2("Info"),
+
+                    html.Br(),
+
+                    html.P(id="info", children= "")
+
+                ]),
+            ]),
+
+
+
+        html.Hr(),
+
+
+        dbc.Row([
+
+                dbc.Col(width=6, children=[
+
+                    html.H2("Ingredients"),
+
                     html.Br(),
 
                     dt.DataTable(
@@ -154,12 +186,6 @@ app.layout = html.Div(
                         columns=[],
                         data=[],
                     ),
-
-                    html.Br(),
-
-                    dbc.Button("Show Recipe", id="Show", color="primary", block=True, className="mt-3", disabled=False),
-
-                    html.Br(),
 
                 ]),
 
@@ -174,12 +200,8 @@ app.layout = html.Div(
                         columns=[],
                         data=[],
                     ),
-
                 ]),
             ]),
-
-        html.Hr(),
-
         ]),
     ]
 )
@@ -197,6 +219,7 @@ def menu_1(buffer):
     Protbuffer = []
     DNAbuffer = []
     HPLCbuffer = []
+    ExpBuffer = []
     Otherbuffer = []
 
     for i, j in enumerate(Buffer):
@@ -205,6 +228,8 @@ def menu_1(buffer):
         if Buffer[i]["use"] == "DNA":
             DNAbuffer.append(Buffer[i]["name"])
         if Buffer[i]["use"] == "HPLC":
+            ExpBuffer.append(Buffer[i]["name"])
+        if Buffer[i]["use"] == "EXP":
             HPLCbuffer.append(Buffer[i]["name"])
         if Buffer[i]["use"] == "Other":
             Otherbuffer.append(Buffer[i]["name"])
@@ -213,6 +238,7 @@ def menu_1(buffer):
     DNAbuffer = sorted(DNAbuffer)
     HPLCbuffer = sorted(HPLCbuffer)
     Otherbuffer = sorted(Otherbuffer)
+    ExpBuffer = sorted(Otherbuffer)
 
 
     options_Protbuffer = [
@@ -224,6 +250,9 @@ def menu_1(buffer):
     options_HPLCbuffer = [
         {"label": i, "value": i}
         for i in HPLCbuffer]
+    options_Expbuffer = [
+        {"label": i, "value": i}
+        for i in ExpBuffer]
     options_Otherbuffer = [
         {"label": i, "value": i}
         for i in Otherbuffer]
@@ -235,6 +264,8 @@ def menu_1(buffer):
         return options_DNAbuffer
     elif buffer == "HPLC":
         return options_HPLCbuffer
+    elif buffer == "EXP":
+        return options_Expbuffer
     elif buffer == "Other":
         return options_Otherbuffer
     else:
@@ -330,7 +361,7 @@ def table_recipe(n_clicks, chosen, vol, vol_unit):
         Amount = {}
 
         if not n_clicks:
-            return columns_recipe, []
+            return [], []
 
         for i, l in enumerate(Buffer):
             if chosen == Buffer[i]["name"]:

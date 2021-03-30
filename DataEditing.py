@@ -110,6 +110,7 @@ app.layout = html.Div(
                                 {"label": "Protein Buffer", "value": "Protein"},
                                 {"label": "DNA Buffer", "value": "DNA"},
                                 {"label": "HPLC Buffer", "value": "HPLC"},
+                                {"label": "Experiment Buffer", "value": "EXP"},
                                 {"label": "Other", "value": "Other"},
                             ],
                             value="",
@@ -326,6 +327,8 @@ def Buffer_Check(n_clicks, BufferName):
 
     if BufferName in BufferListed["name"]:
         return "Buffer found", False, True, True, ""
+    elif BufferName == "":
+        return "Your Buffer needs a name!", False, True, True, ""
     else:
         return "Buffer not found", True, False, False, BufferName
 
@@ -468,7 +471,7 @@ def data(n_clicks, data, columns, subfolder, NameNewBuffer, password):
             #print(Buffer)
             return "Buffer Added!"
         else:
-            return "Wrong Password"
+            return html.H2(style={"color":"red"}, id="success", children = "Wrong Password")
 
 
 @app.callback(
@@ -498,15 +501,17 @@ def show_content(n_clicks, chose):
     if not n_clicks:
         return [], Col_Buffer
 
+    if chose == "":
+        return [], Col_Buffer
     if chose == "buffer":
         with open("Buffer.pickle", "rb") as f:
             Buffer = pickle.load(f)
-            print(Buffer)
+            #print(Buffer)
         return Buffer, Col_Buffer
     if chose == "chem":
         with open("Chemicals.pickle", "rb") as f:
             Chem = pickle.load(f)
-            print(Chem)
+            #print(Chem)
         return Chem, Col_Chem
 
 @app.callback(
@@ -540,7 +545,6 @@ def save_changes(n_clicks, data, columns, password):
                 pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         if columns == Col_Buffer:
-            #data = [{"name": data["name"], "use": data["use"], "ingredients": c, "molarity": d, "unit": e} for (c, d, e) in zip(data["ingredients"].split(", "), data["molarity"].split(", "), data["unit"].split(", "))]
             new_data = []
             for buffer in data:
                 _buffer = {}
@@ -562,7 +566,7 @@ def save_changes(n_clicks, data, columns, password):
 
         return "Update successful"
     else:
-        return "Wrong Password"
+        return html.H2(style={"color":"red"}, id="save_2", children = "Wrong Password")
 
 if __name__ == '__main__':
     app.run_server(debug=True)
