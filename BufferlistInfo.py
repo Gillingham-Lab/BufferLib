@@ -7,7 +7,7 @@ Buffer = [
         "ingredients": ["Tris", "Glycerol", "DTT", "EDTA"],
         "molarity": [50e-3, 5, 1e-3, 1e-3],
         "unit": ["M", "%", "M", "M"],
-        "info": "Adjust pH to 8 with NaOH",
+        "info": "Adjust pH to 8.0 with NaOH",
     },
     {
         "name": "Rad-52 Reaction Buffer",
@@ -23,7 +23,7 @@ Buffer = [
         'ingredients': ['Ammonium Acetate'],
         'molarity': [0.05],
         'unit': ['M'],
-        "info": "",
+        "info": "Adjust pH with one drop of NH3",
     },
     {
         'name': 'KRAS (G12C) Running Buffer (pH 7.0, Marx et al)',
@@ -39,7 +39,7 @@ Buffer = [
         'ingredients': ['PIPES', 'EDTA', 'MgCl2', 'Na2GDP'],
         'molarity': [0.08, 0.0005, 0.002, 0.001],
         'unit': ['M', 'M', 'M', 'M'],
-        "info": "",
+        "info": "Use GTP for polymerisation assays, GDP for binding studies",
     },
 ]
 

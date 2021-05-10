@@ -108,14 +108,14 @@ app.layout = html.Div(
 
                 html.Br(),
 
-                html.P("One Day this will work!"),
+                html.P("The day has come: it works!"),
 
 
             ]),
 
             html.Hr(),
 
-            html.H1("Buffinator"),
+            html.H1("Buffer Library"),
 
             html.Br(),
 
@@ -154,7 +154,7 @@ app.layout = html.Div(
                     dcc.Dropdown(
                         id="Buffer_under_options",
                         options= [],
-                        value= "mgmt_1",
+                        value= "",
                         className= "mb-3"
                     ),
 
@@ -171,13 +171,31 @@ app.layout = html.Div(
 
                     html.H2("Information"),
 
-                    html.H4("Category Info"),
+                    html.Br(),
 
-                    html.P(id="info_cat", children = "Choose category for information"),
+                    html.H4("Category Information"),
 
-                    html.H4("Buffer Info"),
+                    dcc.Textarea(
+                        id="info_cat",
+                        value="",
+                        style={"width": "100%", "height": 50},
+                        disabled=True,
+                        placeholder=""
+                    ),
 
-                    html.P(id="info_Buf", children = ""),
+                    html.Br(),
+
+                    html.Br(),
+
+                    html.H4("Buffer Information"),
+
+                    dcc.Textarea(
+                        id="info_Buf",
+                        value="",
+                        style={"width": "100%", "height": 50},
+                        disabled=True,
+                        placeholder= ""
+                    ),
 
                     html.Br(),
 
@@ -193,7 +211,11 @@ app.layout = html.Div(
 
                 dbc.Col(width=6, children=[
 
-                    html.H2("Ingredients"),
+                    html.H2(id="header_ingredients", children = ""),
+
+                    html.Br(),
+
+                    html.P(id="ingredients_Buffername", children=""),
 
                     html.Br(),
 
@@ -201,13 +223,19 @@ app.layout = html.Div(
                         id="show_ing",
                         columns=[],
                         data=[],
+                        style_cell={'textAlign': 'center'},
+
                     ),
 
                 ]),
 
                 dbc.Col(width=6, children=[
 
-                    html.H2("Recipe"),
+                    html.H2(id= "header_Recipe", children=""),
+
+                    html.Br(),
+
+                    html.P(id="Recipe_Buffername", children = ""),
 
                     html.Br(),
 
@@ -215,9 +243,13 @@ app.layout = html.Div(
                         id="Recipe",
                         columns=[],
                         data=[],
+                        style_cell={'textAlign': 'center'},
                     ),
                 ]),
             ]),
+
+            html.Hr(),
+
         ]),
     ]
 )
@@ -227,13 +259,15 @@ app.layout = html.Div(
 @app.callback(
         [
     Output("Buffer_under_options", "options"),
-    Output("info_cat", "children"),
+    Output("info_cat", "value"),
         ],
     Input("Buffer_options", "value")
 )
 def menu_1(buffer):
     with open("Buffer.pickle", "rb") as f:
         Buffer = pickle.load(f)
+
+    #print(Buffer)
 
     global info_buffer
     Protbuffer = []
@@ -302,21 +336,27 @@ def menu_1(buffer):
             if info_buffer[i]["value"] == "Other":
                 info = info_buffer[i]["info"]
         return options_Otherbuffer, info
+
     else:
-        return [], "Choose category for information"
+        return [], ""
 
 #-------------------- show ing
 
 @app.callback(
-        Output("info_Buf", "children"),
+        Output("info_Buf", "value"),
         Input("Buffer_under_options", "value"),
+        Input("Buffer_options", "value"),
 )
-def Buffer_info(chosen):
+def Buffer_info(chosen, uper_chosen):
     with open("Buffer.pickle", "rb") as f:
         Buffer = pickle.load(f)
+
     for i, j in enumerate(Buffer):
         if Buffer[i]["name"] == chosen:
-            return Buffer[i]["info"]
+            if Buffer[i]["use"] == uper_chosen:
+                return Buffer[i]["info"]
+            else:
+                return ""
 
 
 
@@ -324,6 +364,9 @@ def Buffer_info(chosen):
     [
         Output("show_ing", "columns"),
         Output("show_ing", "data"),
+        Output("header_ingredients", "children"),
+        Output("ingredients_Buffername", "children"),
+        Output("Show", "n_clicks")
     ],
         Input("Buffer_under_options", "value"),
         Input("input-volume-unit", "value"),
@@ -332,14 +375,15 @@ def Buffer_info(chosen):
 def table_ing(chosen, vol, vol_unit):
 
     global columns_ing
+    #print(chosen)
 
     with open("Buffer.pickle", "rb") as f:
         Buffer = pickle.load(f)
-    print(Buffer)
+    #print(Buffer)
 
     try:
         vol = float(vol) * float(vol_unit)
-        max = 0
+        #max = 0
         table_ing = {"number": [], "chem": [], "amount": [], "unit": []}
 
         for i, l in enumerate(Buffer):
@@ -358,12 +402,12 @@ def table_ing(chosen, vol, vol_unit):
 
                     table_ing["amount"].append(amount_ing)
                     table_ing["unit"].append(unit_ing)
-                    max += 1
+                    #max += 1
 
 
         water, water_unit = vol_unit_function(vol)
 
-        table_ing["number"].append(max + 1)
+        table_ing["number"].append("")
         table_ing["chem"].append("Total Volume")
         table_ing["amount"].append(water)
         table_ing["unit"].append(water_unit)
@@ -372,12 +416,12 @@ def table_ing(chosen, vol, vol_unit):
                     zip(table_ing["number"], table_ing["chem"], table_ing["amount"], table_ing["unit"])]
 
         if data_ing[0]["chem"] == "Total Volume":
-            return [], []
+            return [], [], "", "", None
         else:
-            return columns_recipe, data_ing
+            return columns_recipe, data_ing, "Ingredients", chosen, None
 
     except ValueError:
-        return [], []
+        return [], [], "", "", None
 
 
 #-------------------- show recipe
@@ -386,15 +430,16 @@ def table_ing(chosen, vol, vol_unit):
     [
         Output("Recipe", "columns"),
         Output("Recipe", "data"),
+        Output("header_Recipe", "children"),
+        Output("Recipe_Buffername", "children"),
     ],
         Input("Show", "n_clicks"),
-        State("Buffer_under_options", "value"),
+        Input("Buffer_under_options", "value"),
         State("input-volume-unit", "value"),
         State("input-volume", "value"),
 )
 def table_recipe(n_clicks, chosen, vol, vol_unit):
 
-    global columns_recipe
 
     with open("Chemicals.pickle", "rb") as f:
         Chem = pickle.load(f)
@@ -409,7 +454,9 @@ def table_recipe(n_clicks, chosen, vol, vol_unit):
         Amount = {}
 
         if not n_clicks:
-            return [], []
+            return [], [], "", ""
+
+
 
         for i, l in enumerate(Buffer):
             if chosen == Buffer[i]["name"]:
@@ -448,7 +495,7 @@ def table_recipe(n_clicks, chosen, vol, vol_unit):
             table["amount"].append(result)
             table["unit"].append(unit)
 
-        total_vol = 0
+        """total_vol = 0
 
         for j, i in enumerate(table["unit"]):
             if i == "L":
@@ -460,11 +507,11 @@ def table_recipe(n_clicks, chosen, vol, vol_unit):
 
         #print(total_vol)
 
-        water = vol - total_vol
-        water, water_unit = vol_unit_function(water)
+        water = vol - total_vol"""
+        water, water_unit = vol_unit_function(vol)
 
         table["number"].append("")
-        table["chem"].append("Water")
+        table["chem"].append("Fill up with water to ")
         table["amount"].append(water)
         table["unit"].append(water_unit)
 
@@ -475,10 +522,10 @@ def table_recipe(n_clicks, chosen, vol, vol_unit):
         #print(data)
 
 
-        return columns_recipe, data_recipe
+        return columns_recipe, data_recipe, "Recipe", chosen
 
     except ValueError:
-        return columns_recipe, []
+        return [], [], "", ""
 
 
 if __name__ == '__main__':
